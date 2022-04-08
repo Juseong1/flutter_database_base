@@ -1,4 +1,5 @@
 import 'package:databaselist/pages/addpage.dart';
+import 'package:databaselist/pages/updatePage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:databaselist/pages/homepage.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget{
       routes: {
         '/': (context) => homePage(database),
         '/add': (context) => addPage(database),
+        '/update':(context) => updatePage(),
       },
     );
   }

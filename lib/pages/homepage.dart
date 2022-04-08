@@ -35,36 +35,46 @@ class _homePage extends State<homePage>{
                 case ConnectionState.done:
                   if (snapshot.hasData) {
 
-                    return ListView.builder(
+                    return ListView.separated(
                       itemBuilder: (context, index) {
                         Todo todo = (snapshot.data as List<Todo>)[index];
 
                         return ListTile(
+                          onTap: (){
+                            setState((){ todo.active == 1 ? todo.active = 0 : todo.active = 1;});
+                            _updateTodo(todo);
+                            },
+                          onLongPress: ()async{
+                            final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
+
+                            _updateTodo(result as Todo);
+                          },
                           subtitle: Container(
                             child: Column(
                               children: <Widget>[
                                 //출력@@@@@@@@@@@@@@@@@@@@@@@@@
                                 Text('name : ${todo.name!}'),
                                 Text('brand : ${todo.brand!}'),
-                                Text('id : ${todo.id}'),
+                                //Text('id : ${todo.id}'),
                                 Text('layer : ${todo.layer}'),
                                 Text('stackedcount : ${todo.stakedcount}'),
                                 Text('targetcount : ${todo.targetcount}'),
-                                Text('type : ${todo.type!}'),
-                                Text('barcode : ${todo.barcode!}'),
-                                Text('expiredate : ${todo.expiredate!}'),
-                                Text('체크 : ${todo.active == 1 ? 'true' : 'false'}'),
+                                //Text('type : ${todo.type!}'),
+                                //Text('barcode : ${todo.barcode!}'),
+                                //Text('expiredate : ${todo.expiredate!}'),
 
-                                Container(
-                                  height: 1,
-                                  color: Colors.blue,
-                                )
+
                               ],
                             ),
                           ),
+                            tileColor: todo.active == 1 ?  Colors.lightBlueAccent :   Colors.white,
                         );
                       },
                       itemCount: (snapshot.data as List<Todo>).length,
+                      separatorBuilder: (context, index){
+                        if (index == 0)return SizedBox.shrink();
+                        else return const Divider();
+                      },
                     );
                   } else {
                     return Text('No data');//error
@@ -82,19 +92,28 @@ class _homePage extends State<homePage>{
          final todo = await Navigator.of(context).pushNamed('/add');
 
 
-         if(todo !=null) _insertTodo(todo as Todo);                               //database write for addpage
+         if(todo !=null) _insertTodo(todo as Todo);                              //database write for addpage
        },
        child: Icon(Icons.add),
      ), floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-
+  void _updateTodo(Todo todo) async {
+    final Database database = await widget.db;
+    await database.update(
+      'asset_table',
+      todo.toMap(),
+      where: 'id = ? ',
+      whereArgs: [todo.id],
+    );
+    setState(() {Listreset = getTodos();});
+  }
   void _insertTodo(Todo todo) async {
     final Database database = await widget.db;
 
     await database.insert('asset_table', todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-    setState((){ Listreset = getTodos();}); //reset
+    setState((){ Listreset = getTodos();}); //List reset
 
   }
 
@@ -106,13 +125,7 @@ class _homePage extends State<homePage>{
     return List<Todo>.generate(maps.length, (i){
       print('GET TODOS!@!!!!');
       print(maps[i]['id']);
-      print(maps[i]['active']);
 
-      //print(maps[i]['name']);
-      //print(maps[i]['brand']);
-
-      //print(maps[i]['stakedcount']);
-      //print(maps[i]['targetcount']);
       return Todo(
         id            : maps[i]['id'],
         active        : maps[i]['active'],
