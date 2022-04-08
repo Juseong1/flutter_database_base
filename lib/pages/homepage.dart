@@ -42,7 +42,7 @@ class _homePage extends State<homePage>{
                         return ListTile(
                           onTap: (){
                             setState((){ todo.active == 1 ? todo.active = 0 : todo.active = 1;});
-                            _updateTodo(todo);
+                            //_updateTodo(todo);
                             },
                           onLongPress: ()async{
                             final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
@@ -50,19 +50,51 @@ class _homePage extends State<homePage>{
                             _updateTodo(result as Todo);
                           },
                           subtitle: Container(
-                            child: Column(
-                              children: <Widget>[
-                                //출력@@@@@@@@@@@@@@@@@@@@@@@@@
-                                Text('name : ${todo.name!}'),
-                                Text('brand : ${todo.brand!}'),
-                                //Text('id : ${todo.id}'),
-                                Text('layer : ${todo.layer}'),
-                                Text('stackedcount : ${todo.stakedcount}'),
-                                Text('targetcount : ${todo.targetcount}'),
-                                //Text('type : ${todo.type!}'),
-                                //Text('barcode : ${todo.barcode!}'),
-                                //Text('expiredate : ${todo.expiredate!}'),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Checkbox(value: todo.active == 1 ? true : false
+                                ,onChanged: (value){setState((){todo.active == 1 ? todo.active = 0 : todo.active = 1;});},),
+                                Column(
+                                  children: <Widget>[
+                                    //Print@@@@@@@@@@@@@@@@@@@@@@@@@
+                                    Text('name : ${todo.name!}'),
+                                    Text('brand : ${todo.brand!}'),
+                                    //Text('id : ${todo.id}'),
+                                    Text('layer : ${todo.layer}'),
+                                    Text('stackedcount : ${todo.stakedcount}'),
+                                    Text('targetcount : ${todo.targetcount}'),
+                                    //Text('type : ${todo.type!}'),
+                                    //Text('barcode : ${todo.barcode!}'),
+                                    //Text('expiredate : ${todo.expiredate!}'),
 
+                                  ],
+                                ),
+                                IconButton(onPressed: ()async{
+                                  Todo result = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('삭제하기'),
+                                          content:
+
+                                          Text('삭제하시겠습니까?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(todo);
+                                                },
+                                                child: Text('예')),
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('아니요')),
+                                          ],
+                                        );
+                                      });
+                                  _deleteTodo(result as Todo);
+                                }, icon: Icon(Icons.delete_rounded))
 
                               ],
                             ),
@@ -98,6 +130,13 @@ class _homePage extends State<homePage>{
      ), floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+
+  void _deleteTodo(Todo todo) async {
+    final Database database = await widget.db;
+    await database.delete('asset_table', where: 'id = ?', whereArgs: [todo.id]);
+    setState(() {Listreset = getTodos();});
+  }
+
   void _updateTodo(Todo todo) async {
     final Database database = await widget.db;
     await database.update(

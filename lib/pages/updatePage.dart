@@ -18,10 +18,10 @@ class _updatePage extends State<updatePage>{
   @override
   void initState() {
   super.initState();
-  nameController                = new TextEditingController();
-  brandController              = new TextEditingController();
-  stakedcountController       = new TextEditingController();
-  targetcountController        = new TextEditingController();
+  nameController                  = new TextEditingController();
+  brandController                 = new TextEditingController();
+  stakedcountController           = new TextEditingController();
+  targetcountController           = new TextEditingController();
   barcodeController               = new TextEditingController();
   }
 
