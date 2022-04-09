@@ -39,12 +39,14 @@ class _addPage extends State<addPage> {
             child: TextField(
               controller: nameController,
             //decoration: InputDecoration(labelText: ''),
+              textInputAction: TextInputAction.done,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: brandController,
+              textInputAction: TextInputAction.done,
             ),
           ),
 
@@ -54,6 +56,7 @@ class _addPage extends State<addPage> {
             child: TextField(
               keyboardType: TextInputType.number,
               controller: stakedcountController,
+              textInputAction: TextInputAction.done,
             ),
           ),
           Padding(
@@ -61,6 +64,7 @@ class _addPage extends State<addPage> {
             child: TextField(
               keyboardType: TextInputType.number,
               controller: targetcountController,
+              textInputAction: TextInputAction.done,
             ),
           ),
 

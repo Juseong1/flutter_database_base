@@ -41,7 +41,8 @@ class _homePage extends State<homePage>{
 
                         return ListTile(
                           onTap: ()async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                          setState((){_updateTodo(todo);});},
+                          setState((){_updateTodo(todo);});
+                          },
                           onLongPress: ()async{
                             final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
 
@@ -51,9 +52,10 @@ class _homePage extends State<homePage>{
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Checkbox(value: todo.active == 1 ? true : false
-                                ,onChanged: (value)async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                                  setState((){_updateTodo(todo);});},),
+                                Checkbox(value: todo.active == 1 ? true : false,
+                                  onChanged: (value)async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
+                                  setState((){_updateTodo(todo);});},
+                                  ),
 
                                 Column(
                                   children: <Widget>[

@@ -52,7 +52,7 @@ class _updatePage extends State<updatePage>{
               Text('type : ${todo.type}'),
               Text('id : ${todo.id}'),
 
-              TextField(controller: nameController),
+              TextField(controller: nameController , textInputAction:  TextInputAction.done,),
 
               TextButton(onPressed: (){
                 todo.name = nameController!.value.text;
