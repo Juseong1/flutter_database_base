@@ -40,10 +40,8 @@ class _homePage extends State<homePage>{
                         Todo todo = (snapshot.data as List<Todo>)[index];
 
                         return ListTile(
-                          onTap: (){
-                            setState((){ todo.active == 1 ? todo.active = 0 : todo.active = 1;});
-                            //_updateTodo(todo);
-                            },
+                          onTap: ()async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
+                          setState((){_updateTodo(todo);});},
                           onLongPress: ()async{
                             final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
 
@@ -54,31 +52,31 @@ class _homePage extends State<homePage>{
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Checkbox(value: todo.active == 1 ? true : false
-                                ,onChanged: (value){setState((){todo.active == 1 ? todo.active = 0 : todo.active = 1;});},),
+                                ,onChanged: (value)async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
+                                  setState((){_updateTodo(todo);});},),
+
                                 Column(
                                   children: <Widget>[
                                     //Print@@@@@@@@@@@@@@@@@@@@@@@@@
                                     Text('name : ${todo.name!}'),
                                     Text('brand : ${todo.brand!}'),
-                                    //Text('id : ${todo.id}'),
                                     Text('layer : ${todo.layer}'),
                                     Text('stackedcount : ${todo.stakedcount}'),
                                     Text('targetcount : ${todo.targetcount}'),
-                                    //Text('type : ${todo.type!}'),
-                                    //Text('barcode : ${todo.barcode!}'),
-                                    //Text('expiredate : ${todo.expiredate!}'),
 
                                   ],
                                 ),
-                                IconButton(onPressed: ()async{
+
+                                IconButton(//Delete
+                                    onPressed: ()async{
                                   Todo result = await showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('삭제하기'),
+                                          title: Text('삭제 하기'),
                                           content:
 
-                                          Text('삭제하시겠습니까?'),
+                                          Text('항목을 삭제 하시겠습니까?'),
                                           actions: <Widget>[
                                             TextButton(
                                                 onPressed: () {
@@ -104,7 +102,7 @@ class _homePage extends State<homePage>{
                       },
                       itemCount: (snapshot.data as List<Todo>).length,
                       separatorBuilder: (context, index){
-                        if (index == 0)return SizedBox.shrink();
+                        if (index == -1)return SizedBox.shrink();
                         else return const Divider();
                       },
                     );
@@ -117,18 +115,58 @@ class _homePage extends State<homePage>{
           ),
         ),
       ),
+     bottomNavigationBar: Container(
+       height: 80, color:  Colors.blue,
+     child: Row(
+           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+           children: [
+             FloatingActionButton(
+               backgroundColor: Colors.amber,
 
-     floatingActionButton: FloatingActionButton(
-
-       onPressed: ()async{
-         final todo = await Navigator.of(context).pushNamed('/add');
+               onPressed: ()async{
+                 final result = await Navigator.of(context).pushNamed('/add');
 
 
-         if(todo !=null) _insertTodo(todo as Todo);                              //database write for addpage
-       },
-       child: Icon(Icons.add),
-     ), floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                 if(result !=null) _insertTodo(result as Todo);                              //database write for addpage
+               },
+               child: Icon(Icons.add,),
+             ),
+             TextButton(
+               style: TextButton.styleFrom(backgroundColor: Colors.amber),
+               onPressed: ()async{
+                 await Navigator.of(context).pushNamed('/clear');
+                 setState((){Listreset = getTodos();});
+               },
+               child: Text('선택 항목 보기',style: TextStyle(color: Colors.black)),
+             ),
+             FloatingActionButton(
+               onPressed: () async{
+                 final result = await showDialog(context: context, builder: (BuildContext context){
+                   return AlertDialog(title: Text('모두 삭제'),
+                     content: Text('선택된 항목을 모두 삭제 하시겠습니까?'),
+                     actions: <Widget>[
+                       TextButton(onPressed: (){
+                         Navigator.of(context).pop(true);
+                       }, child: Text('예')),
+                       TextButton(onPressed: (){
+                         Navigator.of(context).pop(false);
+                       }, child: Text('아니요')),
+                     ],);
+                 });
+                 if(result == true){_removeAllTodos();}
+               },
+               child: Icon(Icons.remove),
+             ) ,
+           ],
+         ),
+      ),
     );
+  } //build
+
+  void _removeAllTodos()async{
+    final Database database = await widget.db;
+    database.rawDelete('delete from asset_table where active=1');
+    setState((){Listreset = getTodos();});
   }
 
   void _deleteTodo(Todo todo) async {
@@ -163,7 +201,7 @@ class _homePage extends State<homePage>{
 
     return List<Todo>.generate(maps.length, (i){
       print('GET TODOS!@!!!!');
-      print(maps[i]['id']);
+      print('id = ${maps[i]['id']}');
 
       return Todo(
         id            : maps[i]['id'],

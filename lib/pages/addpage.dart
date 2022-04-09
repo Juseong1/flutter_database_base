@@ -70,12 +70,10 @@ class _addPage extends State<addPage> {
             onPressed: (){
               Todo todo = Todo(
 
-
-
                 name: nameController!.value.text,
                 brand: brandController!.value.text,
-                stakedcount: int.parse(stakedcountController!.value.text),
-                targetcount: int.parse(targetcountController!.value.text),
+                stakedcount: stakedcountController!.value.text == '' ? 0 : int.parse(stakedcountController!.value.text),
+                targetcount: targetcountController!.value.text == '' ? 0 : int.parse(targetcountController!.value.text),
 
 
                 active: 0,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:databaselist/pages/homepage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:databaselist/pages/clearpage.dart';
 
 void main() => runApp (MyApp()) ;
 
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget{
       routes: {
         '/': (context) => homePage(database),
         '/add': (context) => addPage(database),
-        '/update':(context) => updatePage(),
+        '/update':(context) => updatePage(database),
+        '/clear':(context) => clearPage(database),
       },
     );
   }
