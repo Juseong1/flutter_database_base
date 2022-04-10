@@ -21,7 +21,7 @@ class _clearPage extends State<clearPage>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text('휴지통'),),
+      appBar: AppBar(title: Text('선택 항목'),),
       body: Container(
         child: Center(
           child: FutureBuilder(
@@ -71,23 +71,50 @@ class _clearPage extends State<clearPage>{
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async{
-          final result = await showDialog(context: context, builder: (BuildContext context){
-            return AlertDialog(title: Text('모두 삭제'),
-            content: Text('해당 페이지 자료를 모두 삭제 하시겠습니까?'),
-            actions: <Widget>[
-              TextButton(onPressed: (){
-                Navigator.of(context).pop(true);
-              }, child: Text('예')),
-              TextButton(onPressed: (){
-                Navigator.of(context).pop(false);
-              }, child: Text('아니요')),
-            ],);
-          });
-          if(result == true){_removeAllTodos();}
-        },
-        child: Icon(Icons.remove),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FloatingActionButton(
+              onPressed: () async{
+                final result = await showDialog(context: context, builder: (BuildContext context){
+                  return AlertDialog(title: Text('모두 삭제'),
+                  content: Text('선택 항목을 모두 삭제 하시겠습니까?'),
+                  actions: <Widget>[
+                    TextButton(onPressed: (){
+                      Navigator.of(context).pop(true);
+                    }, child: Text('예')),
+                    TextButton(onPressed: (){
+                      Navigator.of(context).pop(false);
+                    }, child: Text('아니요')),
+                  ],);
+                });
+                if(result == true){_removeAllTodos();}
+              },
+              child: Icon(Icons.delete_forever),
+            ),
+          ),
+      
+          FloatingActionButton(
+            onPressed: () async{
+              final result = await showDialog(context: context, builder: (BuildContext context){
+                return AlertDialog(title: Text('항목 폴더로 추가'),
+                  content: Text('선택 항목을 모두 폴더로 이동 하겠습니까?'),
+                  actions: <Widget>[
+                    TextButton(onPressed: (){
+                      Navigator.of(context).pop(true);
+                    }, child: Text('예')),
+                    TextButton(onPressed: (){
+                      Navigator.of(context).pop(false);
+                    }, child: Text('아니요')),
+                  ],);
+              });
+              if(result == true){}
+            },
+            child: Icon(Icons.folder),
+          ),
+        ],
       ) ,
     );
   }

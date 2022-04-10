@@ -42,12 +42,12 @@ class _homePage extends State<homePage>{
                         return ListTile(
                           onTap: ()async{
                             await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                            setState((){_updateTodosub(todo);});
+                            setState((){_updateTodo(todo,false);});
                           },
                           onLongPress: ()async{
                             final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
 
-                            _updateTodo(result as Todo);
+                            _updateTodo(result as Todo,true);
                           },
                           subtitle: Container(
                             child: Row(
@@ -56,7 +56,7 @@ class _homePage extends State<homePage>{
                                 Checkbox(value: todo.active == 1 ? true : false,
                                   onChanged: (value)async{
                                   await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                                  setState((){_updateTodosub(todo);});
+                                  setState((){_updateTodo(todo,false);});
                                     },
                                   ),
 
@@ -98,7 +98,6 @@ class _homePage extends State<homePage>{
                                       });
                                   _deleteTodo(result as Todo);
                                 }, icon: Icon(Icons.delete_rounded))
-
                               ],
                             ),
                           ),
@@ -125,6 +124,15 @@ class _homePage extends State<homePage>{
      child: Row(
            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
            children: [
+
+             TextButton(
+               style: TextButton.styleFrom(backgroundColor: Colors.amber),
+               onPressed: ()async{
+                 await Navigator.of(context).pushNamed('/clear');
+               },
+               child: Text('선택 항목 보기',style: TextStyle(color: Colors.black)),
+             ),
+
              FloatingActionButton(
                backgroundColor: Colors.amber,
 
@@ -136,42 +144,11 @@ class _homePage extends State<homePage>{
                },
                child: Icon(Icons.add,),
              ),
-             TextButton(
-               style: TextButton.styleFrom(backgroundColor: Colors.amber),
-               onPressed: ()async{
-                 await Navigator.of(context).pushNamed('/clear');
-               },
-               child: Text('선택 항목 보기',style: TextStyle(color: Colors.black)),
-             ),
-             FloatingActionButton(
-               onPressed: () async{
-                 final result = await showDialog(context: context, builder: (BuildContext context){
-                   return AlertDialog(title: Text('모두 삭제'),
-                     content: Text('선택된 항목을 모두 삭제 하시겠습니까?'),
-                     actions: <Widget>[
-                       TextButton(onPressed: (){
-                         Navigator.of(context).pop(true);
-                       }, child: Text('예')),
-                       TextButton(onPressed: (){
-                         Navigator.of(context).pop(false);
-                       }, child: Text('아니요')),
-                     ],);
-                 });
-                 if(result == true){_removeAllTodos();}
-               },
-               child: Icon(Icons.remove),
-             ) ,
            ],
          ),
       ),
     );
   } //build
-
-  void _removeAllTodos()async{
-    final Database database = await widget.db;
-    database.rawDelete('delete from asset_table where active=1');
-    setState((){Listreset = getTodos();});
-  }
 
   void _deleteTodo(Todo todo) async {
     final Database database = await widget.db;
@@ -179,7 +156,7 @@ class _homePage extends State<homePage>{
     setState(() {Listreset = getTodos();});
   }
 
-  void _updateTodo(Todo todo) async {
+  void _updateTodo(Todo todo , bool reset) async {
     final Database database = await widget.db;
     await database.update(
       'asset_table',
@@ -187,17 +164,9 @@ class _homePage extends State<homePage>{
       where: 'id = ? ',
       whereArgs: [todo.id],
     );
-    setState(() {Listreset = getTodos();});
+    if(reset == true) setState(() {Listreset = getTodos();});
   }
-  void _updateTodosub(Todo todo) async {
-    final Database database = await widget.db;
-    await database.update(
-      'asset_table',
-      todo.toMap(),
-      where: 'id = ? ',
-      whereArgs: [todo.id],
-    );
-  }
+
   void _insertTodo(Todo todo) async {
     final Database database = await widget.db;
 
