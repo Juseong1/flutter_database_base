@@ -11,7 +11,6 @@ class homePage extends StatefulWidget{
 }
 
 class _homePage extends State<homePage>{
-
   Future<List<Todo>>? Listreset;
   @override
   void initState() {
@@ -36,12 +35,14 @@ class _homePage extends State<homePage>{
                   if (snapshot.hasData) {
 
                     return ListView.separated(
+
                       itemBuilder: (context, index) {
                         Todo todo = (snapshot.data as List<Todo>)[index];
 
                         return ListTile(
-                          onTap: ()async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                          setState((){_updateTodo(todo);});
+                          onTap: ()async{
+                            await todo.active == 1 ? todo.active = 0 : todo.active = 1;
+                            setState((){_updateTodosub(todo);});
                           },
                           onLongPress: ()async{
                             final result = await Navigator.of(context).pushNamed('/update', arguments: todo);
@@ -53,8 +54,10 @@ class _homePage extends State<homePage>{
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Checkbox(value: todo.active == 1 ? true : false,
-                                  onChanged: (value)async{await todo.active == 1 ? todo.active = 0 : todo.active = 1;
-                                  setState((){_updateTodo(todo);});},
+                                  onChanged: (value)async{
+                                  await todo.active == 1 ? todo.active = 0 : todo.active = 1;
+                                  setState((){_updateTodosub(todo);});
+                                    },
                                   ),
 
                                 Column(
@@ -137,7 +140,6 @@ class _homePage extends State<homePage>{
                style: TextButton.styleFrom(backgroundColor: Colors.amber),
                onPressed: ()async{
                  await Navigator.of(context).pushNamed('/clear');
-                 setState((){Listreset = getTodos();});
                },
                child: Text('선택 항목 보기',style: TextStyle(color: Colors.black)),
              ),
@@ -186,6 +188,15 @@ class _homePage extends State<homePage>{
       whereArgs: [todo.id],
     );
     setState(() {Listreset = getTodos();});
+  }
+  void _updateTodosub(Todo todo) async {
+    final Database database = await widget.db;
+    await database.update(
+      'asset_table',
+      todo.toMap(),
+      where: 'id = ? ',
+      whereArgs: [todo.id],
+    );
   }
   void _insertTodo(Todo todo) async {
     final Database database = await widget.db;
